@@ -1,6 +1,6 @@
 ---
 layout: post
-title:  "如何切图实现一个不定高宽四边圆角加阴影切兼容ie8-的div!"
+title:  "如何切图实现一个不定高宽四边圆角加阴影且兼容ie8-的div!"
 date:   2019-03-21 20:05:00 +0800
 categories: jekyll update
 ---
