@@ -9,7 +9,15 @@ categories: javascript
 ## 手写
 ### 原型继承
 ``` javascript
+function A() {}
+
+function B() {}
+
+B.prototype = new A();
+
+const b = new B();
 ```
+![原型链继承](./image/yxl.png "原型链继承")
 ### 借用构造函数
 ``` javascript
 ```
