@@ -5,6 +5,66 @@ date:   2019-08-29
 categories: javascript
 ---
 
-# 如何创建对象
-## 工厂模式
-## 原型链模式
+# 如何创建对象  
+常用的对象字面量  
+## 工厂模式  
+``` javascript
+function createObj(name) {
+  let o = new Object();
+  o.name = name;
+  o.sayName = function() {
+    return this.name;
+  }
+}
+
+const obj1 = createObj('obj1');
+const obj2 = createObj('obj2');
+```
+弊端： 
+* 对象无法识别,所有的实例都指向一个原型  
+
+## 构造函数模式  
+``` javascript
+function CreateObj(name, friend) {
+  this.name = name;
+  this.friend = friend;
+  this.sayName = function() {
+    console.log(this.name);  
+  }
+  this.sayFriend = function() {
+    console.log(this.friend);
+  }
+}
+
+const obj1 = new CreateObj('obj1', []);
+const obj2 = new CreateObj('obj2', []);
+```
+弊端：
+* 每个方法都会被创建一次  
+## 原型模式
+``` javascript
+function CreateObj() {
+
+}
+
+CreateObj.prototype.name = "obj"
+
+const obj1 = new CreateObj();
+```
+弊端：
+* 不能初始化参数...  
+* 共享所有的属性和方法  
+> hasOwnPrototype 用于判断属性是属于自己还是属于原型。
+## 组合使用构造函数和原型模式（经典继承）  
+``` javascript
+function CreateObj(name) {
+  this.name = name;
+}
+
+CreateObj.prototype = {
+  constructor: CreateObj,
+  sayName: function() {
+    console.log(this.name);
+  },  
+}
+``` 
