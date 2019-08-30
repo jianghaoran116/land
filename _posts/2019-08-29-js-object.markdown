@@ -41,6 +41,7 @@ const obj2 = new CreateObj('obj2', []);
 ```
 弊端：
 * 每个方法都会被创建一次  
+
 ## 原型模式
 ``` javascript
 function CreateObj() {
@@ -54,7 +55,8 @@ const obj1 = new CreateObj();
 弊端：
 * 不能初始化参数...  
 * 共享所有的属性和方法  
-> hasOwnPrototype 用于判断属性是属于自己还是属于原型。
+hasOwnPrototype 用于判断属性是属于自己还是属于原型。 
+
 ## 组合使用构造函数和原型模式（经典继承）  
 ``` javascript
 function CreateObj(name) {
