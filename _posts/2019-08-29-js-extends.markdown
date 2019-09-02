@@ -18,7 +18,7 @@ B.prototype = new A();
 
 const b = new B();
 ```  
-
+缺点: 共享引用的值，不能向父类的构造函数传参。  
 ### 借用构造函数  
 ``` javascript
 function A(name) {
@@ -40,6 +40,7 @@ function B(name, age) {
 
 const b = new B('b', 12);
 ```  
+缺点: 所有的函数都会被创建一遍。
 ### 组合继承  
 ``` javascript  
 function A(name) {
@@ -233,3 +234,17 @@ function _inherits(subClass, superClass) {
 }
 ```  
 可以获取到父类的静态方法。
+
+Objec.setPrototype: 设置一个对象的原型，polyfill通过__proto__实现。
+
+### 比较一下new和create操作  
+#### new:   
+* 创建一个新对象  
+* 执行构造函数里的语句  
+* 把this赋值给这个对象  
+* 返回构造函数里的对象，如果没有则返回创建的新对象
+### create:  
+* 方法内定义一个新的空对象  
+* 将obj.__proto__的对象指向传入的参数proto
+* 将传入的对象属性复制到obj并且返回obj
+
