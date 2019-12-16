@@ -1,0 +1,77 @@
+---
+layout: post
+title:  "闭包"
+date:   2019-12-16
+categories: javascript
+tags: js基础
+---
+
+# 闭包  
+带着问题理解：  
+1. 闭包是啥  
+2. 闭包的作用（模块）   
+## 什么是闭包  
+``` javascript
+	function foo() {
+		var a = 2;
+		function bar() { // 拥有涵盖foo()作用域的闭包
+			console.log(a);
+		}
+		return bar;
+	}
+	
+	var baz = foo();
+	baz();
+```  
+将内部函数传递到传递到所在词法作用域外，那么它就持有原作用域的引用，如果调用它就会使用闭包。  
+一个变量保存着对一个作用域的引用。这样就形成了闭包。  
+## 闭包的作用-模块  
+``` javascript
+	function CoolModule() {
+		var something = 'cool';
+		var another = [1,2,4];
+		
+		function doSomeThing() {
+			console.log(someThing);
+		}
+		
+		function doAnother() {
+			console.log(another);
+		}
+		
+		return {
+			doSomeThing,
+			doAnother
+		}
+	}
+	
+	var foo = CoolModule();
+	
+	foo.doSomeThing();
+	foo.doAnother():
+```  
+### 模块模式  
+模块模式的两个必要条件:  
+1. 必须要有外部的封装函数。  
+2. 必须返回一个内部函数。  
+``` javascript
+	 var MyModule = (function Manager() {
+	 	var module = {};
+	 	
+	 	function define(name, deps, impl) {
+	 		for (var i = 0; i < deps.length; i +=1) {
+	 			deps[i] = module[deps[i]]
+	 		}
+	 		module[name] = impl.apply(impl, deps)
+	 	}
+	 	
+	 	function get(name) {
+	 		return module[name]
+	 	}
+	 	
+	 	return {
+	 		define,
+	 		get
+	 	}
+	 })()
+```  
