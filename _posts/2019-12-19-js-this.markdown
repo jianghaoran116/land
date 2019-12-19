@@ -1,0 +1,44 @@
+---
+layout: post  
+title:  "this"  
+date:   2019-12-19  
+categories: javascript  
+tags: js基础  
+---  
+
+``` javascript  
+  var value = 1;
+  var foo = {
+    value: 2,
+    bar: function () {
+      return this.value;
+    }
+  }
+  //示例1
+  console.log(foo.bar());
+  //示例2
+  console.log((foo.bar)());
+  //示例3
+  console.log((foo.bar = foo.bar)());
+  //示例4
+  console.log((false || foo.bar)());
+  //示例5
+  console.log((foo.bar, foo.bar)());
+```  
+过程:  
+foo.bar();  
+1. MemberExpression: foo.bar
+2. foo.bar 
+``` javascript
+var Reference = {
+  base: foo,
+  name: bar,
+  strict: false
+}  
+```  
+3. 如果 ref 是 Reference，并且 IsPropertyReference(ref) 是 true, 那么 this 的值为 GetBase(ref)
+this -> foo;
+4. foo.bar(): 2;  
+⁉️  
+ 
+## Reference  
