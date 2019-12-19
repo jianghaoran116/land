@@ -40,5 +40,43 @@ var Reference = {
 this -> foo;
 4. foo.bar(): 2;  
 ⁉️  
- 
+规范类型  
+相当于 meta-values，是用来用算法描述 ECMAScript 语言结构和 ECMAScript 语言类型的。规范类型包括：Reference, List, Completion, Property Descriptor, Property Identifier, Lexical Environment, 和 Environment Record。  
+Reference类型和this有着密切的关联。
 ## Reference  
+引用类型用来说明 delete，typeof，赋值运算符这些运算符的行为。  
+一个 引用 (Reference) 是个已解决的命名绑定。  
+一个引用由三部分组成， 基 (base) 值， 引用名称（referenced name） 和布尔值 严格引用 (strict reference) 标志。  
+base value 就是属性所在的对象或者就是 EnvironmentRecord，它的值只可能是 undefined, an Object, a Boolean, a String, a Number, or an environment record 其中的一种。  
+``` javascript
+  var foo = 1;
+  // 对应的Reference是：
+  var fooReference = {
+    base: EnvironmentRecord,
+    name: 'foo',
+    strict: false
+  };  
+```  
+``` javascript
+  var foo = {
+    bar: function () {
+      return this;
+    }
+  };
+  foo.bar(); // foo
+
+  // bar对应的Reference是：
+  var BarReference = {
+    base: foo,
+    propertyName: 'bar',
+    strict: false
+  };  
+```  
+规范中还提供了获取 Reference 组成部分的方法，比如 GetBase 和 IsPropertyReference  
+- GetBase(V)。 返回引用值 V 的基值组件。  
+- IsPropertyReference(V)。 如果基值是个对象或 HasPrimitiveBase(V) 是 true，那么返回 true；否则返回 false。  
+*简单的理解：如果 base value 是一个对象，就返回true。*   
+
+## 如何确定this的值  
+
+> 引用: [https://github.com/mqyqingfeng/Blog/issues/7]('this')
