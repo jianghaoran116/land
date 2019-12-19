@@ -78,5 +78,11 @@ base value 就是属性所在的对象或者就是 EnvironmentRecord，它的值
 *简单的理解：如果 base value 是一个对象，就返回true。*   
 
 ## 如何确定this的值  
+1. 计算 MemberExpression 的结果赋值给 ref  
+2. 判断 ref 是不是一个 Reference 类型  
+  2.1 如果 ref 是 Reference，并且 IsPropertyReference(ref) 是 true, 那么 this 的值为 GetBase(ref)  
+  2.2 如果 ref 是 Reference，并且 base value 值是 Environment Record, 那么this的值为 ImplicitThisValue(ref)  
+  2.3 如果 ref 不是 Reference，那么 this 的值为 undefined
+
 
 > 引用: [https://github.com/mqyqingfeng/Blog/issues/7]('this')
