@@ -1,0 +1,62 @@
+---
+layout: post  
+title:  "call"  
+date:   2019-12-30  
+categories: javascript  
+tags: js基础  
+---  
+
+``` javascript
+var foo = {
+    value: 1
+};
+
+function bar() {
+    console.log(this.value);
+}
+
+bar.call(foo); // 1
+```  
+
+第一步:  
+- 把foo设为bar的一个属性  
+- 执行这个属性  
+- 删除这个属性  
+``` javascript
+Function.prototype.call2 = function (context) {
+  context.fn = this;
+  context.fn();
+  delete context.fn;
+}
+```  
+
+第二步(可以传参):  
+- 通过arguments获取参数  
+- 通过eval来运行  
+``` javascript  
+Function.prototype.call2 = function(context) {
+  var args = [];
+  for (var i = 1; i < arguments.length; i++) {
+    args.push('arguments[' + i + ']');
+  }
+  context.fn = this;
+  eval('context.fn(' + args + ')');
+  delete context.fn;
+}
+```  
+  
+第三步(this可以为null, 函数可以有返回值):  
+``` javascript  
+Function.prototype.call2 = function(context) {
+  var context = context || window;
+  var args = [];
+  for (var i = 1; i < arguments.length; i++) {
+    args.push('arguments[' + i + ']');
+  }
+  context.fn = this;
+
+  var res = eval('context.fn(' + args + ')');
+  delete context.fn;
+  return res;
+}
+```
