@@ -1,0 +1,21 @@
+---
+layout: post  
+title:  "new"  
+date:   2019-12-30  
+categories: javascript  
+tags: js基础  
+---  
+
+``` javascript  
+function objectFactory() {
+  var obj = new Object();
+  var Constructor = [].shift.apply(arguments);
+  obj.__proto__ = Constructor.prototype;
+  var ret = Constructor.apply(obj, arguments);
+  return typeof ret === 'object' ? ret : obj ;
+}
+```
+  
+- 首先要执行一下构造函数  
+- 然后再关联一下原型 __proto___
+- 然后判断一下是否返回的是对象
