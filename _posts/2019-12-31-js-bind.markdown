@@ -6,6 +6,17 @@ categories: javascript
 tags: js基础  
 ---  
 
+思路:
+- 利用apply模拟，返回apply后的函数  
+- 传参 (可以bind的时候传，也可以执行的时候传)
+**需要注意的点**  
+- 类数组转化为数组  
+- ``` javascript
+  Arrary.from();
+  [...args];
+  Array.prototype.slice.call();
+```  
+  
 第一步:  
 ``` javascript  
 
