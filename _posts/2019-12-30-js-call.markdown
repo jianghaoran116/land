@@ -6,6 +6,17 @@ categories: javascript
 tags: js基础  
 ---  
 
+模拟call的实现  
+思路: 
+- 将函数设置为这个对象的一个属性  
+- 执行一次  
+- 删除这个属性  
+**要注意的点**:  
+- call可以传参,通过arguments来实现  
+- 通过eval来执行代码  
+- call可以传入null  
+- 传入的函数可以有返回值  
+
 ``` javascript
 var foo = {
     value: 1
@@ -22,6 +33,7 @@ bar.call(foo); // 1
 - 把foo设为bar的一个属性  
 - 执行这个属性  
 - 删除这个属性  
+  
 ``` javascript
 Function.prototype.call2 = function (context) {
   context.fn = this;
@@ -33,6 +45,7 @@ Function.prototype.call2 = function (context) {
 第二步(可以传参):  
 - 通过arguments获取参数  
 - 通过eval来运行  
+  
 ``` javascript  
 Function.prototype.call2 = function(context) {
   var args = [];
