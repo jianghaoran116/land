@@ -1,0 +1,17 @@
+---
+layout: post
+title:  "url->image"
+date:   2020-01-08
+categories: js
+tags: js
+---
+
+# url到页面
+## 网络部分  
+### DNS  
+如何得到IP
+### 页面交互  
+### 网络协议七层  
+## 浏览器部分  
+### 正常的解析流程  
+### 浏览器的缓存机制  

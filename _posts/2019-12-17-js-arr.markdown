@@ -5,9 +5,17 @@ date:   2019-12-17
 categories: javascript
 tags: js基础
 ---
-# ES3
-- for
-- forEach
-- map  
-# ES5  
-# ES6
+
+# 删除数组中的某一个元素  
+## 元素是简单的值类型  
+```javascript
+var arr = [2, 3, 4];
+
+del(arr, str) {
+  let res = arr.filter((item) => item !== str);
+  return res;
+}
+
+console.log(del(arr, 2));
+console.log(arr);
+```  
