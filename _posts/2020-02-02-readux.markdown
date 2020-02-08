@@ -7,13 +7,13 @@ tags: redux基础
 ---  
 
 # Redux的整体流程  
-![最基本的流程](./image/redux-1.png)  
+![最基本的流程]([./image/redux-1.png](https://raw.githubusercontent.com/jianghaoran116/land/gh-pages/_posts/image/redux-1.png))  
 通过一个action触发(dispatch)reducer, 返回一个新的store。 
 
-![view的链接](./image/redux-2.png)  
+![view的链接]([./image/redux-2.png](https://raw.githubusercontent.com/jianghaoran116/land/gh-pages/_posts/image/redux-2.png))  
 store提供了一个订阅发布模式，通知view层。view可以通过action creator触发dispatch action修改store。  
 
-![一个比较完整的流程](./image/redux-3.png)  
+![一个比较完整的流程]([./image/redux-3.png](https://raw.githubusercontent.com/jianghaoran116/land/gh-pages/_posts/image/redux-3.png))  
 
 ## createStore()  
 主要的流程逻辑  
