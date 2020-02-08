@@ -1,0 +1,91 @@
+---
+layout: post
+title:  "redux"
+date:   2019-12-19
+categories: redux
+tags: redux基础
+---  
+
+# Redux的整体流程  
+![最基本的流程](./image/redux-1.png)  
+通过一个action触发(dispatch)reducer, 返回一个新的store。 
+
+![view的链接](./image/redux-2.png)  
+store提供了一个订阅发布模式，通知view层。view可以通过action creator触发dispatch action修改store。  
+
+![一个比较完整的流程](./image/redux-3.png)  
+
+## createStore()  
+主要的流程逻辑  
+### 入参: reducer, preloadedState, enhancer  
+reducer -- 需要更新的state  
+preloadedState -- 初始state 场景: ssr  
+enhancer提供给中间件使用，返回一个增强的dispatch的store  
+``` javascript  
+return enhancer(createStore)(reducer, preloadedState)
+```  
+### 内部变量  
+dispatch -- 调用对应的reducer 通知 订阅事件。
+getstate -- 返回currentReducer  
+### 返回一个对象
+```  javascript  
+{
+  getState,
+  dispatch,
+  subscribe,
+  ...
+}
+```  
+
+## compose(f1, f2, f3) -> f1(f2(f3()))  
+``` javascript  
+function compose(...funcs) {
+  // ...
+  funcs.reduce((ret, item) => (...args) => item(ret(args)));
+}
+```  
+
+## applyMiddleware 以单个中间件为例  
+``` javascript  
+
+function applyMiddleware(middleware) {
+  return createStore => (...args) => {
+    const store = createStore(...args);
+    let dispatch = store.dispatch;
+    const midApi = {
+			getState: store.getState,
+			dispatch: (...args) => dispatch(...args),
+    }
+
+    dispatch = middlewares(midApi)(store.dispatch);
+    return {
+      ...store,
+      dispatch,
+    }
+  }
+}
+
+// 以thunk为例
+const thunk = ({dispatch, getState}) => next => action => {
+  if (typeof action === 'function') {
+    return action(dispatch, getState);
+  }
+  return next(action);
+}
+```  
+
+## bindActionCreators 和 bindActionCreator  
+用dispatch包一层action 让用户感知不到dispatch  
+react-redux的mapDispatchToProps使用了这个
+``` javascript
+function bindActionCreator(creator, dispatch) {
+  return (...args) => dispatch(creator(...args))
+}
+
+function bindActionCreators(creators, dispatch) {
+  return Object.keys(creators).reduce((ret, item) => {
+    ret[item] = bindActionCreator(creators[item], dispatch);
+    return ret;
+  })
+}
+```  
