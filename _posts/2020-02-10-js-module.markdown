@@ -1,7 +1,7 @@
 ---
 layout: post
 title:  "module"
-date:   2019-02-10
+date:   2020-02-10
 categories: javascript
 tags: js基础
 ---  
@@ -25,7 +25,8 @@ tags: js基础
 - 导出
   ``` javascript  
   module.exports = {}
-  ```
+  ```  
+
 ## AMD  
 定义了web端的模块规范  
 异步导入  
@@ -86,6 +87,7 @@ tags: js基础
     }
   })
   ```  
+
 ## ES6  
 语言级的规范  
 - 导入  
