@@ -1,0 +1,80 @@
+---
+layout: post
+title:  "module"
+date:   2019-02-10
+categories: javascript
+tags: js基础
+---  
+
+# JS模块化  
+为什么需要模块化，解决了什么问题  
+- 变量命名冲突的问题  
+- 文件加载顺序的问题  
+
+引出规范:  
+- 每个模块都有自己的变量作用域  
+- 导入导出方法  
+
+## CMD  
+定义了node端的模块规范  
+同步导入，'单例模式'
+- 导入  
+  ``` javascript  
+  require('');
+  ```  
+- 导出
+  ``` javascript  
+  module.exports = {}
+  ```
+## AMD  
+定义了web端的模块规范  
+异步导入  
+- 导入
+  ``` javacript  
+  reuqire(['mA'], function(mA) {})
+  ```
+- 导出
+  ``` javascript  
+  define(function() {
+    return function() {
+      ...
+      return ... // 这个就是模块的导出结果
+    }
+  })
+  ```  
+
+## UMD  
+同时支持CMD和AMD规范  
+通过判断环境来使用CMD环境还是AMD环境
+``` javascript  
+(function(self, factory) {
+  if (typeof module === 'object' && typeof module.exports === 'object') {
+    module.exports = factory()
+  } else if (typeof define === 'function' && defined.amd) {
+    define(factory)
+  } else {
+    self.umdModule = factory();
+  }
+}(this, function() {
+  return function() {
+    return 'ma';
+  }
+}))
+```  
+## ES6  
+语言级的规范  
+- 导入  
+  ``` javascript  
+  import m from '...'
+  import { m } form '...'
+  ```  
+- 导出  
+  ``` javascript
+  export default {
+    ...
+  }
+
+  export {
+    ...
+  }
+  ```  
