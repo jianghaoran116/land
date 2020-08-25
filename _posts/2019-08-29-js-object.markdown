@@ -3,7 +3,7 @@ layout: post
 title:  "js创建对象"
 date:   2019-08-29
 categories: javascript
-tags: js基础
+tags: js
 ---
 
 # 如何创建对象  

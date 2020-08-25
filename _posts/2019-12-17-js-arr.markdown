@@ -3,7 +3,7 @@ layout: post
 title:  "js数组遍历"
 date:   2019-12-17
 categories: javascript
-tags: js基础
+tags: js
 ---
 
 # 数组  

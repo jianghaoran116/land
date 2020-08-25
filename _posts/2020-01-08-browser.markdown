@@ -1,9 +1,9 @@
 ---
 layout: post
-title:  "url->image"
-date:   2020-01-08
-categories: js
-tags: js
+title: "url->image"
+date: 2020-01-08
+categories: browser
+tags: 浏览器
 ---
 
 # url到页面

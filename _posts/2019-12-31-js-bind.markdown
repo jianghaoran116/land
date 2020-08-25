@@ -2,8 +2,8 @@
 layout: post  
 title:  "bind"  
 date:   2019-12-30  
-categories: javascript  
-tags: js基础  
+categories: javascript
+tags: js
 ---  
 
 思路:

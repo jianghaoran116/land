@@ -1,9 +1,9 @@
 ---
 layout: post
-title:  "module"
-date:   2020-02-10
+title: "JS模块化"
+date: 2020-02-10
 categories: javascript
-tags: js基础
+tags: js
 ---  
 
 # JS模块化  

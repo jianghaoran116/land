@@ -2,8 +2,8 @@
 layout: post  
 title:  "call"  
 date:   2019-12-30  
-categories: javascript  
-tags: js基础  
+categories: javascript
+tags: js
 ---  
 
 模拟call的实现  

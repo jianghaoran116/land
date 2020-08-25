@@ -2,8 +2,8 @@
 layout: post  
 title:  "create object"  
 date:   2020-01-02  
-categories: javascript  
-tags: js基础  
+categories: javascript
+tags: js
 ---  
 # 创建对象  
 ## 工厂方法  

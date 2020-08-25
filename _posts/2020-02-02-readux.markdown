@@ -1,9 +1,9 @@
 ---
 layout: post
 title:  "redux"
-date:   2019-02-02
-categories: redux
-tags: redux基础
+date: 2020-02-02
+categories: react
+tags: react
 ---  
 
 # Redux的整体流程  

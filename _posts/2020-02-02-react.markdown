@@ -1,9 +1,9 @@
 ---
 layout: post
-title:  "react"
-date:   2019-12-19
+title:  "react基础概念"
+date: 2019-12-19
 categories: react
-tags: react基础
+tags: react
 ---  
 
 # 虚拟DOM是怎么做比较的，同级子元素怎么做diff的，怎么查询出来差别的，查出来之后怎么应用到DOM上，达到最新的状态的。  

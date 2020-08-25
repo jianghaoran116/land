@@ -1,9 +1,9 @@
 ---
 layout: post
-title:  "算法"
+title:  "动态规划"
 date:   2020-01-17
-categories: js
-tags: js
+categories: 算法  
+tags: 算法  
 ---  
 ## 0-1背包的回溯解决办法  
 ### 递归  

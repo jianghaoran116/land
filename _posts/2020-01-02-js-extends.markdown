@@ -2,8 +2,8 @@
 layout: post  
 title:  "extends"  
 date:   2020-01-02  
-categories: javascript  
-tags: js基础  
+categories: javascript
+tags: js
 ---  
 # 继承:  
 ## 原型链继承  
