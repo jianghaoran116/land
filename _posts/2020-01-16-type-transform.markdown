@@ -3,7 +3,7 @@ layout: post
 title: "类型转换"
 date: 2020-01-16  
 categories: js  
-tags: js基础  
+tags: js  
 ---  
 ## toString() JSON.stringify()  
 ## toNumber  

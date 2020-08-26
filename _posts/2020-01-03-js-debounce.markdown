@@ -3,7 +3,7 @@ layout: post
 title: "防截"
 date: 2020-01-03
 categories: js  
-tags: js基础  
+tags: js  
 ---
 
 # 防抖
