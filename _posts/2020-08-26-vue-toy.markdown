@@ -1,0 +1,179 @@
+---
+layout: post  
+title: "vue初始化阶段之通过reactive双向绑定"  
+date: 2020-08-26  
+categories: vue  
+tags: vue  
+---  
+
+# 双向绑定之reactive、effects  
+effects里面存放的是一个map，里面存着通过依赖收集收集来的依赖（可以理解成函数队列）。  
+reactvie负责包装传进来的对象，通过Proxy代理这个对象，在get属性的时候收集依赖，在set的时候触发这些依赖，实现双向绑定。  
+
+``` javascript  
+reactive(config.data) // 对data进行reactive包装 data变成可被监听
+```  
+
+reactive函数:  
+``` javascript  
+function reactive(object) {
+  const observed = new Proxy(object, {
+    // 在get里做依赖收集
+    get(object, property) {
+      if (currenEffect) {
+        if (!effects.has(object))
+          effects.set(object, new Map());
+
+        if (!effects.get(object).has(property))
+          effects.get(object).set(property, []);
+
+        effects.get(object).get(property).push(currenEffect);
+      }
+
+      return object[property];
+    },
+
+    // 通过set可以监听到哪个属性赋值到哪 - 双向绑定的基础
+    set(object, property, value) {
+      object[property] = value;
+      if (effects.has(object) && effects.get(object).get(property)){
+        for (let effect of effects.get(object).get(property)) {
+          effect();
+        }
+      }
+      return value;
+    },
+  });
+
+  return observed;
+  }
+```  
+
+effects:  
+``` javascript  
+const effects = new Map();
+let currenEffect = null; // 会被添加进effects对应的value里
+
+function effect(fn) {
+  currenEffect = fn;
+  fn();
+  currenEffect = null;
+};
+```  
+
+
+# v-系列属性的简单实现  
+属性在遍历模版的时候处理，比如有个traversal函数，递归调用，配合收集依赖，比如双花括号 v-model，get的时候会将这些属性作为对应的key值设置到effects里，set的时候会从effects里读取对应的值，然后执行一下里面的函数队列  
+traversal:  
+这个函数主要遍历模版，取出对应的节点的文本或属性，如果有依赖属性会触发effect，然后get的时候会设置依赖  
+``` javascript  
+traversal(node) {
+  // 如果是textnode
+  if (node.nodeType === Node.TEXT_NODE) { // 3
+    // 取花括号的值
+  }
+
+  // 访问attributes
+  if (node.nodeType === Node.ELEMENT_NODE) { // 1
+    // 判断属性的名称 作出相应的动作 比如v-model
+  }
+}
+```  
+
+## v-model  
+匹配到这个值之后 effect 然后在元素上绑定一下input事件  
+``` javascript  
+if (attribute.name === 'v-model') {
+  let name = attribute.value;
+  effect(() => node.value = this.data[name]);
+  node.addEventListener('input', event => this.data[name] = node.value)
+}
+```  
+
+## v-bind  
+effect  
+``` javascript  
+if (attribute.name.match(/^v-bind:([\s\S]+)$/)) {
+  let attrName = RegExp.$1;
+  let name = attribute.value;
+  effect(() => node.setAttribute(attrName, this.data[name]));
+}
+```  
+
+## v-on  
+绑定methods里对应的事件，需要处理this的指向问题  
+``` javascript  
+if (attribute.name.match(/^v-on:([\s\S]+)$/)) {
+  let eventName = RegExp.$1;
+  let name = attribute.value;
+  node.addEventListener(eventName, this[name])
+}
+```  
+
+## Reflect  
+Reflect是一个内置的对象，它提供拦截 JavaScript 操作的方法，这些方法与处理器对象的方法相同。  
+Reflect不是一个函数对象，因此它是不可构造的。  
+Reflect想要解决的问题:  
+  - 将Object对象的一些明显属于语言内部的方法移到Reflect上  
+  - 修改Object上某些方法的返回值使其更加合理  
+  - 让Object的操作变得更加函数式  
+  - 与 Proxy对象的方法一一对应  
+
+#### Reflect.apply()  
+
+参数 | 含义 | 必选
+- | - | -
+target | 目标函数 | Y
+thisArgument | target函数调用时绑定的this对象 | N
+argumentsList | 参数 类数组的对象 | N
+
+``` javascript  
+  // Reflect.apply(target, thisArgument, argumentsList)
+  Reflect.apply(Math.floor, undefined, [1.75]) // 1
+```  
+
+#### Reflect.construct()  
+
+参数 | 含义 | 必选
+- | - | -
+target | 被运行的目标函数 | Y
+argumentsList | 调用构造函数的数组或者伪数组 | Y
+newTarget | 如果使用 newTarget 参数，则表示继承了 newTarget 这个超类 | N
+
+``` javascript  
+  // Reflect.construct(target, argumentsList[, newTarget])
+  function someConstructor () {}
+  var result = Reflect.construct(Array, [], someConstructor)
+
+  Reflect.getPrototypeOf(result) // 输出：someConstructor.prototype
+  Array.isArray(result) // true
+```  
+
+#### Reflect.define​Property()  
+#### Reflect.delete​Property()  
+#### Reflect.get()  
+``` javascript  
+  // Object
+  var obj = { x: 1, y: 2 }
+  Reflect.get(obj, 'x') // 1
+
+  // Array
+  Reflect.get(['zero', 'one'], 1) // "one"
+```  
+#### Reflect.set()  
+
+参数 | 含义 | 必选
+- | - | -
+target | 获取原型的目标对象	 | Y
+propertyKey | 设置的属性的名称	 | Y
+value | 设置的值	 | Y
+receiver | 如果遇到 setter，this 将提供给目标调用 | N
+
+``` javascript  
+  var obj = {};
+  Reflect.set(obj, "prop", "value"); // true
+  obj.prop; // "value"
+
+```  
+
+## Proxy  
