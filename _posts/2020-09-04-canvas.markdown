@@ -1,0 +1,61 @@
+---
+layout: post  
+title: "canvas基础"  
+date: 2020-09-04  
+categories: threeJs  
+tags: threeJs canvas  
+---  
+
+# canvas是如何绘制的  
+
+## canvas是如何控制高度和宽度的  
+``` html  
+  <body>
+    <canvas width="640" height="360"></canvas>
+  </body>
+```  
+**Canvas 元素上的 width 和 height 属性不等同于 Canvas 元素的 CSS 样式的属性**  
+- 元素上的width、height属性决定了canvas的坐标系 称这个为**画布宽高**  
+- CSS样式的属性影响了canvas画布的大小 称这个为**样式宽高**  
+
+画布宽高和样式宽高分开的做法，能更方便地适配不同的显示设备  
+
+## canvas的坐标系统  
+- 2D  
+  canvas使用左上角为定点 X轴向右 Y轴向下的坐标系  
+- 3D  
+  左手坐标系  
+
+## 在画布中间画一个正方形  
+``` javascript  
+  context.fillStyle = 'red';
+  context.beginPath();
+  context.rect(mycanvas.width * 0.5, mycanvas.height * 0.5, 100, 100);
+  context.fill();
+```  
+如果想要把正方形居中
+- 正方形绘制的时候设置中点的坐标  
+  ``` javascript  
+    context.rect(mycanvas.width * 0.5 - 50, mycanvas.height * 0.5 - 50, 100, 100);
+  ```  
+- 平移画布  
+  ``` javascript  
+    context.translate(-50, -50);
+  ```  
+  平移画布后需要重置画布，重置画布的方式  
+  - 手动平移  
+    ``` javascript  
+      context.translate(-50, -50);
+      // balabal
+      context.translate(50, 50);
+    ```  
+  - 利用api  
+    ``` javascript  
+      context.start(); 
+      context.translate(-50, -50);
+      // balabal
+      context.restore(); 
+    ```  
+
+canvas获取事件  
+待续...
