@@ -8,14 +8,13 @@ title: 切図の少年
 subtitle: 
 description: 擅长切各种圆角需平铺的图
 author: Joge
-url: /land
 # Support language: de, en, fr-FR, id, ja, ko, pt-BR, pt, ru, zh-Hans, zh-hk, zh-tw
 language: en
 date_format: '%Y-%m-%d'
 
 # URL
 ## If your site is put in a subdirectory, set url as 'http://yoursite.com' and baseurl as '/child'
-url: /land
+url:
 baseurl: /land
 permalink: pretty
 
