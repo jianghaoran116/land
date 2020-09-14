@@ -9,7 +9,7 @@ tags: js
 ## JS中的面向对象  
 来个问题先  
 ![](https://raw.githubusercontent.com/jianghaoran116/land/gh-pages/_posts/image/object-1.png)  
-然后如何把 prototype, \__proto__, constructor对应上  
+然后如何把 prototype, \__proto__, constructor三个属性对应上  
 
 - #### prototype  
   每个函数都有一个prototype属性。*prototype是函数才会有的属性*  
@@ -39,7 +39,24 @@ tags: js
 - JS通过原型的方式来描述对象  
 - 使用原型和原型链来实现继承，很多同学说继承不合适，可以理解成委托  
 
-## V8里对象的隐藏类(map)  
+### JS的属性  
+- 第一类属性: 数据属性。  
+  - value: 属性的值, 默认值为undefined  
+  - writable: 属性能否被赋值  
+  - enumerable: 能否枚举  
+  - configurable: 属性能否被删除或者改变特征值  
+
+- 第二类属性: 访问器（getter/setter）属性。  
+  - getter: 函数或 undefined，在取属性值时被调用  
+  - setter: 函数或 undefined，在设置属性值时被调用  
+  - enumerable: 能否枚举  
+  - configurable: 属性能否被删除或者改变特征值  
+
+## V8里对象的属性  
+- 常规属性(properties)  
+- 排序属性 (element)
+
+## V8里对象里的一个属性: 隐藏类(map)  
 隐藏类(map)它主要包括了属性名称和每个属性所对应的偏移量  
 V8拿对象的起始位置加上偏移量，就得到属性的值在内存中的位置  
 **有了这个隐藏类，V8在解析的时候可以提高速度**  
@@ -69,6 +86,7 @@ const person3 = new Person('person3', 23);
 ```  
 
 然后我们通过d8观察一下对象，其中map隐藏类的地址都为一样的:  
+![有帮助的截图]({{ site.url }}/pics/object-4.png)
 ![](https://raw.githubusercontent.com/jianghaoran116/land/gh-pages/_posts/image/object-4.png)  
 - 修改属性  
   ``` javascript  
