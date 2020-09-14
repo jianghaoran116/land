@@ -6,10 +6,39 @@ categories: javascript
 tags: js  
 ---
 
-主要是想讲一下JS中的面向对象  
+主要讲一下JS中的面向对象  
 先看下图  
-![new function](https://raw.githubusercontent.com/jianghaoran116/land/gh-pages/_posts/image/object-1.png)  
-然后如何把 prototype, __proto__, constructor对应上  
+![](https://raw.githubusercontent.com/jianghaoran116/land/gh-pages/_posts/image/object-1.png)  
+然后如何把 prototype, \__proto__, constructor对应上  
+
+- #### prototype  
+每个函数都有一个prototype属性。*prototype是函数才会有的属性*  
+这个函数的prototype属性指向该对象的原型  
+
+- #### __proto__  
+每一个JavaScript对象(除了null)都具有的一个属性, 叫__proto__, 这个属性会指向该对象的原型。  
+*当使用 obj.__proto__ 时，可以理解成返回了 Object.getPrototypeOf(obj)*  
+
+- #### constructor  
+原型对象指向构造函数  
+
+![](https://raw.githubusercontent.com/jianghaoran116/land/gh-pages/_posts/image/object-2.png)  
+
+``` javascript  
+  function Person() {}
+  var person = new Person();
+  console.log(person.__proto__ === Person.prototype);
+```  
+
+### 原型的原型  
+![](https://raw.githubusercontent.com/jianghaoran116/land/gh-pages/_posts/image/object-3.png)  
+
+## JS实现面向对象的方式选择的是原型系统  
+
+
+
+
+
 
 javascript面向对象的程序设计。
 # 面向对象  
