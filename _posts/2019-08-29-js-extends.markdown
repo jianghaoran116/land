@@ -7,7 +7,7 @@ tags: js
 ---
 
 主要讲一下JS中的面向对象  
-先看下图  
+来个问题先  
 ![](https://raw.githubusercontent.com/jianghaoran116/land/gh-pages/_posts/image/object-1.png)  
 然后如何把 prototype, \__proto__, constructor对应上  
 
@@ -30,13 +30,119 @@ tags: js
   console.log(person.__proto__ === Person.prototype);
 ```  
 
+没有 Object.create、Object.setPrototypeOf 的早期版本中，**new运算是唯一一个可以指定[[prototype]]的方法**。  
+
 ### 原型的原型  
 ![](https://raw.githubusercontent.com/jianghaoran116/land/gh-pages/_posts/image/object-3.png)  
 
 ## JS实现面向对象的方式选择的是原型系统  
+- JS通过原型的方式来描述对象  
+- 使用原型和原型链来实现继承，很多同学说继承不合适，可以理解成委托  
 
+## V8里的对象  
+这里主要介绍一下隐藏类(map)  
+还实现了隐藏类(map)描述了对象的属性布局  
+隐藏类(map)它主要包括了属性名称和每个属性所对应的偏移量，拿到对象的起始位置加上偏移量，就得到属性的值在内存中的位置  
+有了这个隐藏类，V8在解析的时候可以提高速度  
+**两个对象的形状是相同的，V8 就会为其复用同一个隐藏类**  
+两个对象的形状是相同的，要满足以下两点  
+- 相同的属性名称  
+- 相等的属性个数  
 
+现在我们构造对象的时候基本使用class，所以名称和个数都是一样的，但是有些对对象的操作也会重新构建隐藏类，所以我们在开发的时候尽量避免  
+我们用d8工具来看看哪些操作会重新构建隐藏类  
+首先我们来创建一个类，并且用它来实例化一些对象  
+``` javascript  
+class Person {
+  constructor(name, age) {
+    this.name = name;
+    this.age = age;
+  }
+}
 
+const person1 = new Person('person1', 20);
+const person2 = new Person('person2', 22);
+const person3 = new Person('person3', 23);
+%DebugPrint(person1);
+%DebugPrint(person2);
+%DebugPrint(person3);
+```  
+然后我们通过d8观察一下对象，其中map隐藏类的地址都为一样的:  
+![](https://raw.githubusercontent.com/jianghaoran116/land/gh-pages/_posts/image/object-4.png)  
+- 修改属性  
+  ``` javascript  
+  class Person {
+    constructor(name, age) {
+      this.name = name;
+      this.age = age;
+    }
+  }
+
+  const person1 = new Person('person1', 20);
+  const person2 = new Person('person2', 22);
+  const person3 = new Person('person3', 23);
+  %DebugPrint(person1);
+  %DebugPrint(person2);
+  %DebugPrint(person3);
+
+  person1.age = 30;
+  person2.age = 31;
+  person3.age = 29;
+  %DebugPrint(person1);
+  %DebugPrint(person2);
+  %DebugPrint(person3);
+  ```  
+  ![](https://raw.githubusercontent.com/jianghaoran116/land/gh-pages/_posts/image/object-5.png)  
+  map隐藏类的地址都为一样的  
+- 添加属性  
+  ``` javascript  
+  class Person {
+    constructor(name, age) {
+      this.name = name;
+      this.age = age;
+    }
+  }
+
+  const person1 = new Person('person1', 20);
+  const person2 = new Person('person2', 22);
+  const person3 = new Person('person3', 23);
+  %DebugPrint(person1);
+  %DebugPrint(person2);
+  %DebugPrint(person3);
+
+  person1.job = '';
+  person2.car = '';
+  person3.bag = '';
+  %DebugPrint(person1);
+  %DebugPrint(person2);
+  %DebugPrint(person3);
+  ```  
+  ![](https://raw.githubusercontent.com/jianghaoran116/land/gh-pages/_posts/image/object-6.png)  
+  发现添加新的属性都会重新构建隐藏类  
+- 删除属性  
+  ``` javascript  
+  class Person {
+    constructor(name, age) {
+      this.name = name;
+      this.age = age;
+    }
+  }
+
+  const person1 = new Person('person1', 20);
+  const person2 = new Person('person2', 22);
+  const person3 = new Person('person3', 23);
+  %DebugPrint(person1);
+  %DebugPrint(person2);
+  %DebugPrint(person3);
+
+  delete person1.name;
+  delete person2.age;
+  %DebugPrint(person1);
+  %DebugPrint(person2);
+  %DebugPrint(person3);
+  ```  
+  ![](https://raw.githubusercontent.com/jianghaoran116/land/gh-pages/_posts/image/object-7.png)  
+  删除属性也会重新构建隐藏类  
 
 
 
