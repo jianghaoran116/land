@@ -6,6 +6,11 @@ categories: javascript
 tags: js  
 ---
 
+主要是想讲一下JS中的面向对象  
+先看下图  
+![new function](https://raw.githubusercontent.com/jianghaoran116/land/gh-pages/_posts/image/object-1.png)  
+然后如何把 prototype, __proto__, constructor对应上  
+
 javascript面向对象的程序设计。
 # 面向对象  
 先了解下JS中的对象及历史，这样方便我们了解为何JS这么设计。然后再看看JS的对象特征。最后看看对象里的属性。
@@ -16,6 +21,8 @@ JS通过原型的方式来描述对象，然后为了模仿Java，在原型的�
 - 对象具有唯一标识性  
 - 对象有状态  
 - 对象具有行为  
+
+JS的对象就是一堆属性和值的集合  
 
 JS如何实现的
 - 对象具有唯一标识性（通过内存地址来实现）  
@@ -51,6 +58,85 @@ JS如何实现的
 使用getOwnPropertyDescripter()来查看, 使用Object.defineProperty来定义属性, Object.defineProperties()定义多个属性  
 
 *"基于原型"的编程看起来更为提倡程序员去**关注一系列对象实例的行为**，然后才去关心如何将这些对象，**划分到最近的使用方式相似的原型对象**，而不是将它们分成类。*
+
+## 对象的属性值有三种类型  
+- 原始类型  
+  null、undefined、boolean、number、string、bigint、symbol  
+- 对象类型  
+- 函数类型  
+
+V8 内部是怎么实现函数可调用特性的呢  
+有两个隐藏属性
+- name  
+  函数的名称，匿名函数为anonymous  
+- code  
+  函数代码  
+函数到底关联了哪些内容
+- 函数作为一个对象，它有自己的属性和值，所以函数关联了基础的属性和值  
+- 函数之所以成为特殊的对象，这个特殊的地方是函数可以“被调用”，所以一个函数被调用时，它还需要关联相关的执行上下文  
+
+然而在 V8 实现对象存储时，并没有完全采用字典的存储方式，这主要是出于性能的考量。因为字典是非线性的数据结构，查询效率会低于线性的数据结构，V8 为了提升存储和查找效率，采用了一套复杂的存储策略  
+- 常规属性 (properties)  
+- 排序属性 (element)  
+
+隐藏类(map)描述了对象的属性布局  
+  它主要包括了属性名称和每个属性所对应的偏移量  
+  V8 会查询 point 的 map 中 x 属性相对 point 对象的偏移量，然后将 point 对象的起始位置加上偏移量，就得到了 x 属性的值在内存中的位置，有了这个位置也就拿到了 x 的值，这样我们就省去了一个比较复杂的查找过程。
+
+``` javascript  
+function Foo() {
+  this[1] = 1;
+};
+let bar = new Foo();
+let bar1 = new Foo();
+%DebugPrint(bar);
+%DebugPrint(bar1);
+```  
+
+``` javascript  
+function Foo() {
+  this[1] = 1;
+};
+let bar = new Foo();
+let bar1 = new Foo();
+%DebugPrint(bar);
+%DebugPrint(bar1);
+bar[2] = 2;
+bar1[2] = 2;
+%DebugPrint(bar);
+%DebugPrint(bar1);
+```  
+
+``` javascript  
+function CreatePerson(name) {
+  this.name = name;
+};
+
+CreatePerson.prototype.sayname = function() {
+  console.log(this.name);
+};
+
+var person = new CreatePerson('kevin');
+
+%DebugPrint(person);
+person.age = 20;
+%DebugPrint(person);
+```  
+
+``` javascript  
+class Person {
+  constructor(name) {
+    this.name = name;
+  }
+}
+
+const person = new Person('joge');
+%DebugPrint(person);
+person.name = 'test';
+%DebugPrint(person);
+person.age = 20;
+%DebugPrint(person);
+```  
 
 # 原型和原型链  
 可以理解成JS是如何实现面向对象的。  
