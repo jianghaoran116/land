@@ -8,7 +8,7 @@ tags: js
 
 ## JS中的面向对象  
 来个问题先  
-![](https://raw.githubusercontent.com/jianghaoran116/land/gh-pages/_posts/image/object-1.png)  
+![函数对象和对象]({{ site.url }}/pics/object-1.png)  
 然后如何把 prototype, \__proto__, constructor三个属性对应上  
 
 - #### prototype  
@@ -22,7 +22,7 @@ tags: js
 - #### constructor  
   原型对象指向构造函数   
 
-![](https://raw.githubusercontent.com/jianghaoran116/land/gh-pages/_posts/image/object-2.png)  
+![原型链]({{ site.url }}/pics/object-2.png)  
 
 ``` javascript  
   function Person() {}
@@ -33,7 +33,7 @@ tags: js
 没有 Object.create、Object.setPrototypeOf 的早期版本中，**new运算是唯一一个可以指定[[prototype]]的方法**。  
 
 ### 原型的原型  
-![](https://raw.githubusercontent.com/jianghaoran116/land/gh-pages/_posts/image/object-3.png)  
+![原型的原型]({{ site.url }}/pics/object-3.png)  
 
 ### JS实现面向对象的方式选择的是原型系统  
 - JS通过原型的方式来描述对象  
@@ -86,8 +86,7 @@ const person3 = new Person('person3', 23);
 ```  
 
 然后我们通过d8观察一下对象，其中map隐藏类的地址都为一样的:  
-![有帮助的截图]({{ site.url }}/pics/object-4.png)
-![](https://raw.githubusercontent.com/jianghaoran116/land/gh-pages/_posts/image/object-4.png)  
+![map隐藏类]({{ site.url }}/pics/object-4.png)  
 - 修改属性  
   ``` javascript  
   class Person {
@@ -111,7 +110,7 @@ const person3 = new Person('person3', 23);
   %DebugPrint(person2);
   %DebugPrint(person3);
   ```  
-  ![](https://raw.githubusercontent.com/jianghaoran116/land/gh-pages/_posts/image/object-5.png)  
+  ![修改对象属性]({{ site.url }}/pics/object-5.png)  
   map隐藏类的地址都为一样的  
 - 添加属性  
   ``` javascript  
@@ -136,8 +135,8 @@ const person3 = new Person('person3', 23);
   %DebugPrint(person2);
   %DebugPrint(person3);
   ```  
-  ![](https://raw.githubusercontent.com/jianghaoran116/land/gh-pages/_posts/image/object-6.png)  
-  发现添加新的属性都会重新构建隐藏类  
+  ![添加属性]({{ site.url }}/pics/object-6.png)  
+  添加新的属性都会重新构建隐藏类  
 - 删除属性  
   ``` javascript  
   class Person {
@@ -160,7 +159,7 @@ const person3 = new Person('person3', 23);
   %DebugPrint(person2);
   %DebugPrint(person3);
   ```  
-  ![](https://raw.githubusercontent.com/jianghaoran116/land/gh-pages/_posts/image/object-7.jpeg)  
+  ![删除属性]({{ site.url }}/pics/object-7.png)  
   删除属性也会重新构建隐藏类  
 
 所以我们在开发的时候尽量避免使用delete，初始化的时候也尽量一次性完整且顺序的初始化对象。  
