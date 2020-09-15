@@ -1,6 +1,6 @@
 ---
 layout: post  
-title: "JS面向对象"  
+title: "JS面向对象 - 全都是'泡沫'?"  
 date: 2020-09-04  
 categories: javascript  
 tags: js  
@@ -18,9 +18,10 @@ tags: js
 - #### \__proto__  
   每一个JavaScript对象(除了null)都具有的一个属性, 叫__proto__, 这个属性会指向该对象的原型。  
   *当使用 obj.__proto__ 时，可以理解成返回了 Object.getPrototypeOf(obj)*  
+  **埋个伏笔: Function对象.__proto__呢，这个主要用于做什么的**
 
 - #### constructor  
-  原型对象指向构造函数   
+  原型对象指向构造函数  
 
 ![原型链]({{ site.url }}/land/pics/object-2.png)  
 
@@ -39,7 +40,7 @@ tags: js
 - JS通过原型的方式来描述对象  
 - 使用原型和原型链来实现继承，很多同学说继承不合适，可以理解成委托  
 
-### JS的属性  
+### JS对象的属性  
 - 第一类属性: 数据属性。  
   - value: 属性的值, 默认值为undefined  
   - writable: 属性能否被赋值  
@@ -54,13 +55,20 @@ tags: js
 
 ## V8里对象的属性  
 - 常规属性(properties)  
-- 排序属性 (element)
+- 排序属性 (element)  
+- \__proto__ 属性  
+- 隐藏类(map)  
 
-## V8里对象里的一个属性: 隐藏类(map)  
-隐藏类(map)它主要包括了属性名称和每个属性所对应的偏移量  
+常规属性和排序属性理解为V8为了提升查找效率  
+可以理解为属性少的时候查找效率高，属性多查找效率低  
+\__proto__ 属性为了方便我们访问[[property]]访问器属性  
+隐藏类(map)是浏览器为了高效的解析对象  
+
+### 隐藏类(map)  
+它主要包括了属性名称和每个属性所对应的偏移量  
 V8拿对象的起始位置加上偏移量，就得到属性的值在内存中的位置  
 **有了这个隐藏类，V8在解析的时候可以提高速度**  
-### 多个对象共用一个隐藏类  
+#### 多个对象共用一个隐藏类  
 *两个对象的形状是相同的，V8 就会为其复用同一个隐藏类*  
 两个对象的形状是相同的，要满足以下两点  
 - 相同的属性名称  
@@ -87,7 +95,7 @@ const person3 = new Person('person3', 23);
 
 然后我们通过d8观察一下对象，其中map隐藏类的地址都为一样的:  
 ![map隐藏类]({{ site.url }}/land/pics/object-4.png)  
-- 修改属性  
+- 试试修改属性  
   ``` javascript  
   class Person {
     constructor(name, age) {
@@ -162,4 +170,134 @@ const person3 = new Person('person3', 23);
   ![删除属性]({{ site.url }}/land/pics/object-7.jpeg)  
   删除属性也会重新构建隐藏类  
 
-所以我们在开发的时候尽量避免使用delete，初始化的时候也尽量一次性完整且顺序的初始化对象。  
+**所以我们在开发的时候尽量避免使用delete，初始化的时候也尽量一次性完整且顺序的初始化对象。**  
+
+## 最后看看babel是如何编译的  
+### bable编译的class对象  
+这里挑主要的babel编译代码:  
+``` javascript  
+var Person = /*#__PURE__*/function () {
+  function Person(name) {
+    _classCallCheck(this, Person);
+    this.name = name;
+  }
+
+  _createClass(Person, [{
+    key: "sayName",
+    value: function sayName() {
+      console.log(this.name);
+    }
+  }]);
+
+  return Person;
+}();
+```  
+关注的点:  
+- _classCallCheck
+  防止不是new的方式调用这个构造函数  
+  ``` javascript  
+  function _instanceof(left, right) {
+    if (right != null && typeof Symbol !== "undefined" && right[Symbol.hasInstance]) { 
+      return !!right[Symbol.hasInstance](left);
+    } else { 
+      return left instanceof right;
+    }
+  }
+  function _classCallCheck(instance, Constructor) {
+    if (!_instanceof(instance, Constructor)) {
+      throw new TypeError("Cannot call a class as a function");
+    }
+  }
+  ```  
+- 通过_createClass挂方法  
+  - 动态方法挂到Constructor.prototype上  
+  - 静态方法直接挂到Constructor上  
+  ``` javascript  
+  function _defineProperties(target, props) {
+    for (var i = 0; i < props.length; i++) {
+      var descriptor = props[i];
+      descriptor.enumerable = descriptor.enumerable || false;
+      descriptor.configurable = true;
+      if ("value" in descriptor) descriptor.writable = true;
+      Object.defineProperty(target, descriptor.key, descriptor);
+    }
+  }
+  function _createClass(Constructor, protoProps, staticProps) {
+    if (protoProps) _defineProperties(Constructor.prototype, protoProps);
+    if (staticProps) _defineProperties(Constructor, staticProps);
+    return Constructor;
+  }
+  ```  
+
+### bable编译的extend  
+继承我们主要看_inherits  
+``` javascript  
+function _inherits(subClass, superClass) { 
+  if (typeof superClass !== "function" && superClass !== null) {
+    throw new TypeError("Super expression must either be null or a function"); 
+  } 
+  subClass.prototype = Object.create(
+    superClass && superClass.prototype, 
+    { constructor: { value: subClass, writable: true, configurable: true } }
+  ); 
+  if (superClass) _setPrototypeOf(subClass, superClass);
+}
+```  
+- Object.create  
+  ``` javascript  
+  function _inherits(subClass, superClass) { 
+    if (typeof superClass !== "function" && superClass !== null) {
+      throw new TypeError("Super expression must either be null or a function"); 
+    } 
+    subClass.prototype = Object.create(
+      superClass && superClass.prototype, 
+      { constructor: { value: subClass, writable: true, configurable: true } }
+    ); 
+    if (superClass) _setPrototypeOf(subClass, superClass);
+  }
+  ```  
+- _setPrototypeOf: Function.__proto__  
+  ``` javascript  
+  function _setPrototypeOf(o, p) {
+    _setPrototypeOf = Object.setPrototypeOf || function _setPrototypeOf(o, p) { 
+      o.__proto__ = p; 
+      return o;
+    }; 
+    return _setPrototypeOf(o, p); 
+  }
+  ```  
+  **伏笔在这,继承父类的静态属性**  
+
+### 私有属性  
+下一代规范使用\#xxx表示xxx是个私有属性  
+一般是两种实现方式  
+- 常规的用Symbol做key加闭包的方式  
+  ``` javascript  
+  (function() {
+    var key = Symbol('private'); // 外部拿不到这个key
+    function Person() {
+      this[key] = 10;
+    }
+
+    buy() {
+      this[key] -= 10;
+    }
+  })()
+  ```  
+- babel编译的: 使用WeakMap 通过实例的this做关联  
+  ``` javascript  
+  (function() {
+    var privateProperites = new WeakMap() // 以实例为key 里面的key不算引用计数
+    // Map
+    function Person() {
+      privateProperites.set(this, {
+        money: 10
+      })
+    }
+
+    getMoney() {
+      privateProperites.get(this)['money']
+    }
+  })()
+  ```  
+  **使用WeakMap是为了垃圾回收(里面的key不算引用计数)**
