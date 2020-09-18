@@ -10,8 +10,17 @@ tags: js
 JS通过原型的方式来描述对象，通过此文了解下浏览器是如何处理对象和babel是如何编译class的  
 
 ## 先回顾一下原型  
-![函数对象和对象]({{ site.url }}/land/pics/object-1.png)  
-如何把 prototype, \__proto__, constructor 三个属性对应上?  
+<!-- ![函数对象和对象]({{ site.url }}/land/pics/object-1.png)   -->
+通过构造函数创建一个对象后 prototype, \__proto__, constructor 都指向哪了？  
+``` javascript  
+  function Person() {
+    // ...
+  }
+  const person = new Person();
+  // Person.prototype
+  // Person.prototype.constructor
+  // person.__proto__
+```  
 
 - **prototype**  
   每个函数都有一个默认的prototype属性，这个prototype属性指向该函数的原型对象  
