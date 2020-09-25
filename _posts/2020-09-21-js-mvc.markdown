@@ -18,10 +18,182 @@ tags: js
 - View ViewModel层:  
   - 绘制页面（添加、删除DOM）  
   - 监听事件，包括: 页面的开始、结束、取消事件，同时收集回调函数  
-  - 设置Model层的状态，比如开始事件会修改页面状态为已开始  
 
 - Controller:  
   - 提供给二次开发用的API, 控制页面开始、结束、取消  
+  - 设置Model层的状态，比如开始事件会修改页面状态为已开始  
+
+代码:  
+- Model:  
+  ``` javascript  
+    class VRModel {
+      constructor() {
+        this._transitionPageStage = null; // 过渡页的状态 - 开始 结束
+      }
+
+      get transitionPageStage() {
+        return this._transitionPageStage;
+      }
+
+      set transitionPageStage(stage) {
+        this._transitionPageStage = stage;
+      }
+    }
+  ```  
+  这个时候Model比较单薄，只有一个页面状态  
+
+- View:  
+  ``` javascript  
+    class TransitionPage {
+      constructor(Ai, options, callbacks) {
+        // ...
+      }
+
+      /**
+       * 设置DOM
+       */
+      addDom() {
+        return new Promise((resolve, reject) => {
+          // ...
+        })
+      }
+
+      /**
+       * 移除DOM
+       */
+      removeDom() {
+        return new Promise((resolve, reject) => {
+          // ...
+        })
+      }
+
+      /**
+       * 渐隐DOM
+       */
+      fadeOutDom() {
+        return new Promise((resolve, reject) => {
+          // ...
+        })
+      }
+
+      /**
+      * 给cancel按钮绑定事件
+      */
+      cancelAddClick() {
+        // ...
+      }
+
+      /**
+      * 给cancel按钮解绑事件
+      */
+      cancelRemoveClick() {
+        // ...
+      }
+
+      /**
+      * 取消过渡页面
+      */
+      cancelTransition = () => {
+        return this.fadeOutDom().then(() => {
+          // ...
+        });
+      }
+
+      /**
+      * 画页面
+      */
+      drawPage() {
+        // ...
+      }
+
+      /**
+      * 卸载页面
+      */
+      destoryPage() {
+        // ...
+      }
+
+      /**
+      * 重新设置页面上的状态
+      */
+      reSetState() {
+        // ...
+      }
+
+      // --------以下为提供给展示端的方法----------
+
+      /**
+       * 渲染过渡页面
+       */
+      createPage(options) {
+        // ...
+      }
+
+      /**
+       * 渲染过渡页面
+       */
+      createPageTask(params) {
+        // ...
+      }
+
+      /**
+      * 关闭页面
+      */
+      finishPage(cb) {
+        // ...
+      }
+
+      /**
+      * 取消页面
+      */
+      cancelPage(cb) {
+        // ...
+      }
+    }
+  ```  
+  在这里进行页面的绘制，事件都是通过回调函数来处理  
+  二次开发的API也在这层  
+- controller层:  
+  ``` javascript  
+    import TransitionPage from '...transition-page';
+    import TransitionPageModel from '...index';
+
+    class VRController {
+      constructor(Ai, options) {
+        // ...
+      }
+
+      // 初始化提供给展示端控制的API
+      initApi = () => {
+        // ...
+      }
+
+      /**
+      * 预加载方法
+      */
+      preLoading = () => {
+        // ...
+      }
+
+      /**
+      * 创建过渡页面
+      */
+      createTransitionPage = (options) => {
+        this.TransitionPage.createPage(options);
+      }
+
+      /**
+      * 卸载过渡页面
+      */
+      finishTransitionPage = () => {
+        this.TransitionPage.finishPage();
+      }
+
+      // ...
+
+    }
+  ```  
+  这层拿到了view和model 设置自己需要的事件 设置model里的数据  
 
 接下来继续学习一下MVC  
 
@@ -54,11 +226,14 @@ Controller层是负责用户交互的
 
 **另一个很重要的需求是提供应用程序的二次开发接口**，这个建议放到ViewModel层，因为这层持用view的数据和Model层的数据  
 
+*个人还是Model觉得model越厚越好，厚能直接体现业务，而且后期的迭代在Model层多，其他层会比较稳定。*  
+
 从上面的角度出发:  
 修改点:  
 - Model层添加一个订阅发布的库  
 - ViewModel层也添加一个订阅发布  
 - 绘制页面具体内容上浮到Controller，真正绘制交给View或者Model，这样Controller可以在自己的DOM上添加感兴趣的事件  
+
 这样数据和事件的边界都定义好了  
 
 修改后的分层:  
@@ -66,7 +241,7 @@ Model层:
 - 页面的状态  
 - 添加一个监听/发布库，页面状态发生变化时通知上层  
 
-View ViewModel:  
+View/ViewModel:  
 - 绘制页面 （添加删除DOM）-> 提供事件，具体的DOM及DOM上的事件移到Controller层，由Controller决定画什么  
 - 监听事件  页面的开始、结束、取消事件。 收集回调函数  
 - 一些事件会设置Model层的状态 -> 不设置Model层的数据 提供事件由Controller层来设置  
@@ -77,12 +252,11 @@ Controller:
 - 通过调用事件来设置Model的状态  
 - 收集第三方的回调函数，适当的时候触发  
 
-
-
-
-## 判断写的程序架构是否优良  
+### 判断写的程序架构是否优良  
 - 最低耦合原则  
 - 单一职责原则  
+
+*Model的数据更新发出 DataChanged 事件后，由 Controller 负责监听并 Update View，这样就变成了MVP架构。*  
 
 # VUE  
 ## 向大佬递自己  
@@ -92,44 +266,3 @@ ViewModel 和 View 不应该有引用关系，而是由中间者，将它们绑�
 # React + (Redux | Mobx)  
 - JSX
 - Redux 它试图用一种统一的模式和机制来简化状态管理的复杂性，达到复杂系统状态变化“可预测”的目的  
-
-解藕
-
-1、在 Controller 中处理所有的业务逻辑，包括监听 View 事件， IO 请求数据，格式化 Model 数据供 View 展示等。该流派认为 ViewModel 是 Controller 的瘦身。
-2、在 Model 中处理大部分的业务逻辑，也就是所谓的“胖 Model”，Model 提供格式化的数据给 View，Model 就需要关心 View 的细节，导致 Model 的复用性变差。将格式化 Model 的数据转移到 ViewModel 中，认为 ViewModel 是胖 Model 的瘦身。
-3、最后一种，是老师文中说的，ViewModel 属于 View 的一部分，辅助 View 局部更新，我还是第一次听到这种说法。在我看来局部化更新由 Controller 来触发，ViewModel 只负责提供数据，完全跟 View 扯不上关系。但从 Word 的例子来看，这么说也有道理。不过老师也解释了，该模式并不算 MVVM。
-  
-
-
-"路由"  
-
-Model数据层
-Controller负责Process（处理）
-处理什么呢 “Model + 由 View 转发的事件” 作为 输入 - Model的改变及View的事件  处理的结果是 Model，更新数据。
-View理解成数据的映射  
-
-Model的数据更新发出 DataChanged 事件后，由 Controller 负责监听并 Update View，这样就变成了MVP架构。
-
-
-
-
-Model 层：一个多用户（Multi-User）的 Model 层，和单租户的 Session-based Model。从服务端来说，Session-based Model 是一个很简单的转译层。但是从浏览器端来说，Session-based Model 是一个完整的单租户 DOM 模型。  
-View 层：实际是 ViewModel 层，真正的 View 层被浏览器实现了。ViewModel 只有 View 层的数据和可被委托的事件。  
-Controller 层：由多个相互解耦的 Controller 构成。切记不要让 Controller 之间相互知道对方，更不要让 View 知道某个具体的 Controller 存在。  
-
-ViewModel
-
-
-
-
-DOM的绘制是在Model层还是view层？  
-
-浏览器打开index.htm，首先创建canvas画布对象，后面的画图操作都是在画布对象上进行的。  
-接着加载dom对象，注意这里并没有实例化dom对象。  
-
-然后加载view对象，并且实例化view对象和dom对象。  
-view对象中定义了事件处理规则，接管画布的事件处理，将onpaint委托给了doc和contraller，注意doc的onpaint和contraller的onpaint绘制的是不同的内容，还有就是定义了contraller的操作规则。  
-
-接下来就是加载contraller，调用view的方法注册自己，并将事件处理委托给contraller。  
-
-最后加载和显示菜单，定义contraller的鼠标点击事件，在点击事件中指定当前contraller。这样当鼠标在画布上移动时，通过层层委托（画布——view——contraller）最终触发contraller的invalidate，invalidate触发onpaint，onpaint触发doc.onpaint。  
