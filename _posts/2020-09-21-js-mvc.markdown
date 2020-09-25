@@ -1,0 +1,135 @@
+---
+layout: post  
+title: "MVC"  
+date: 2020-09-14  
+categories: javascript  
+tags: js  
+---
+
+## 原生JS开发  
+探究一下没有使用框架情况下保证代码质量及开发效率  
+先除去工程化的要求，从拆分功能最基础的开始（MVC）  
+
+以开发一个过渡页为例，页面由其他开发者调用，有开始、取消、结束状态，状态变化会触发一些事件  
+那么开始分层:  
+- Model层:  
+  存放页面的状态 表示开始，结束，取消  
+
+- View ViewModel层:  
+  - 绘制页面（添加、删除DOM）  
+  - 监听事件，包括: 页面的开始、结束、取消事件，同时收集回调函数  
+  - 设置Model层的状态，比如开始事件会修改页面状态为已开始  
+
+- Controller:  
+  - 提供给二次开发用的API, 控制页面开始、结束、取消  
+
+接下来继续学习一下MVC  
+
+## MVC  
+上来直接抛个问题: M越厚越好？  
+
+### Model  
+它包含了向上承载的实实在在的业务数据，还有不同数据间的关联关系，**即关心数据的意义，又关心数据本身**，体现业务  
+主要的职责:  
+- 负责业务需求的内核逻辑  
+  把逻辑更多向Model层倾斜，那么Controller层就简洁很多  
+- 发出DataChanged事件, 上层就能够感知到Model层的变化  
+  事件就是Model层面对需求变化点的对策,用事件回调来解决需求的变化点  
+
+### View/ViewModel  
+负责界面呈现 响应用户交互事件  
+- 负责界面呈现，View层和Model层的关系非常紧密，紧密到需要知道数据结构的细节  
+- 有时候数据到界面这个过程比较复杂的时候就需要加个ViewModel层来做这个事情  
+  - ViewModel层是为View的界面呈现而设计的Model层，它的数据组织更接近于View的表达  
+  - ViewModel只有View层的数据和可被委托的事件  
+
+### Controller  
+控制器是 MVC 的大脑，它知道接下去该让谁去做什么事  
+Controller层是负责用户交互的  
+
+### 从分层角度  
+- 倾向于认为 Model层在最底层  
+- View层在中间，承上启下的桥梁作用，连接Model与Controller，它提供事件委托  
+- Controller层在最上方，它知道Model和View层，它通过DOM接口操作Model层，但它并不操作View去改变数据，而只是监听自己感兴趣的事件，然后调用 Model 或 ViewModel 的接口修改数据  
+
+**另一个很重要的需求是提供应用程序的二次开发接口**，这个建议放到ViewModel层，因为这层持用view的数据和Model层的数据  
+
+从上面的角度出发:  
+修改点:  
+- Model层添加一个订阅发布的库  
+- ViewModel层也添加一个订阅发布  
+- 绘制页面具体内容上浮到Controller，真正绘制交给View或者Model，这样Controller可以在自己的DOM上添加感兴趣的事件  
+这样数据和事件的边界都定义好了  
+
+修改后的分层:  
+Model层:  
+- 页面的状态  
+- 添加一个监听/发布库，页面状态发生变化时通知上层  
+
+View ViewModel:  
+- 绘制页面 （添加删除DOM）-> 提供事件，具体的DOM及DOM上的事件移到Controller层，由Controller决定画什么  
+- 监听事件  页面的开始、结束、取消事件。 收集回调函数  
+- 一些事件会设置Model层的状态 -> 不设置Model层的数据 提供事件由Controller层来设置  
+- 提供给二次开发用的API  
+
+Controller:  
+- 监听感兴趣的事件  
+- 通过调用事件来设置Model的状态  
+- 收集第三方的回调函数，适当的时候触发  
+
+
+
+
+## 判断写的程序架构是否优良  
+- 最低耦合原则  
+- 单一职责原则  
+
+# VUE  
+## 向大佬递自己  
+MVVM 最早是由微软工程师 John Grossman 于 2005 年提出的。ViewModel 作为 View 的数据抽象层，持有 View 的状态和行为。
+ViewModel 和 View 不应该有引用关系，而是由中间者，将它们绑定。ViewModel 改变后自动的触发对应 View 的更新，View 的触发事件后，ViewModel 接收并做处理。在实现层面这种绑定关系最适合由响应式框架来做，从而实现 ViewModel 和 View 的双向绑定。
+
+# React + (Redux | Mobx)  
+- JSX
+- Redux 它试图用一种统一的模式和机制来简化状态管理的复杂性，达到复杂系统状态变化“可预测”的目的  
+
+解藕
+
+1、在 Controller 中处理所有的业务逻辑，包括监听 View 事件， IO 请求数据，格式化 Model 数据供 View 展示等。该流派认为 ViewModel 是 Controller 的瘦身。
+2、在 Model 中处理大部分的业务逻辑，也就是所谓的“胖 Model”，Model 提供格式化的数据给 View，Model 就需要关心 View 的细节，导致 Model 的复用性变差。将格式化 Model 的数据转移到 ViewModel 中，认为 ViewModel 是胖 Model 的瘦身。
+3、最后一种，是老师文中说的，ViewModel 属于 View 的一部分，辅助 View 局部更新，我还是第一次听到这种说法。在我看来局部化更新由 Controller 来触发，ViewModel 只负责提供数据，完全跟 View 扯不上关系。但从 Word 的例子来看，这么说也有道理。不过老师也解释了，该模式并不算 MVVM。
+  
+
+
+"路由"  
+
+Model数据层
+Controller负责Process（处理）
+处理什么呢 “Model + 由 View 转发的事件” 作为 输入 - Model的改变及View的事件  处理的结果是 Model，更新数据。
+View理解成数据的映射  
+
+Model的数据更新发出 DataChanged 事件后，由 Controller 负责监听并 Update View，这样就变成了MVP架构。
+
+
+
+
+Model 层：一个多用户（Multi-User）的 Model 层，和单租户的 Session-based Model。从服务端来说，Session-based Model 是一个很简单的转译层。但是从浏览器端来说，Session-based Model 是一个完整的单租户 DOM 模型。  
+View 层：实际是 ViewModel 层，真正的 View 层被浏览器实现了。ViewModel 只有 View 层的数据和可被委托的事件。  
+Controller 层：由多个相互解耦的 Controller 构成。切记不要让 Controller 之间相互知道对方，更不要让 View 知道某个具体的 Controller 存在。  
+
+ViewModel
+
+
+
+
+DOM的绘制是在Model层还是view层？  
+
+浏览器打开index.htm，首先创建canvas画布对象，后面的画图操作都是在画布对象上进行的。  
+接着加载dom对象，注意这里并没有实例化dom对象。  
+
+然后加载view对象，并且实例化view对象和dom对象。  
+view对象中定义了事件处理规则，接管画布的事件处理，将onpaint委托给了doc和contraller，注意doc的onpaint和contraller的onpaint绘制的是不同的内容，还有就是定义了contraller的操作规则。  
+
+接下来就是加载contraller，调用view的方法注册自己，并将事件处理委托给contraller。  
+
+最后加载和显示菜单，定义contraller的鼠标点击事件，在点击事件中指定当前contraller。这样当鼠标在画布上移动时，通过层层委托（画布——view——contraller）最终触发contraller的invalidate，invalidate触发onpaint，onpaint触发doc.onpaint。  
