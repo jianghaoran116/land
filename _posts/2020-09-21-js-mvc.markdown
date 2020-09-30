@@ -28,7 +28,7 @@ tags: js
   ``` javascript  
     class VRModel {
       constructor() {
-        this._transitionPageStage = null; // 过渡页的状态 - 开始 结束
+        this._transitionPageStage = null;
       }
 
       get transitionPageStage() {
@@ -53,27 +53,17 @@ tags: js
        * 设置DOM
        */
       addDom() {
-        return new Promise((resolve, reject) => {
-          // ...
-        })
+        // ...
+        template = `<div>xxx</div>`;
+        this.$el.innerHTML = template;
+        // ...
       }
 
       /**
        * 移除DOM
        */
       removeDom() {
-        return new Promise((resolve, reject) => {
-          // ...
-        })
-      }
 
-      /**
-       * 渐隐DOM
-       */
-      fadeOutDom() {
-        return new Promise((resolve, reject) => {
-          // ...
-        })
       }
 
       /**
@@ -94,9 +84,6 @@ tags: js
       * 取消过渡页面
       */
       cancelTransition = () => {
-        return this.fadeOutDom().then(() => {
-          // ...
-        });
       }
 
       /**
@@ -110,13 +97,6 @@ tags: js
       * 卸载页面
       */
       destoryPage() {
-        // ...
-      }
-
-      /**
-      * 重新设置页面上的状态
-      */
-      reSetState() {
         // ...
       }
 
@@ -155,23 +135,12 @@ tags: js
   二次开发的API也在这层  
 - controller层:  
   ``` javascript  
-    import TransitionPage from '...transition-page';
-    import TransitionPageModel from '...index';
-
     class VRController {
       constructor(Ai, options) {
         // ...
       }
 
-      // 初始化提供给展示端控制的API
       initApi = () => {
-        // ...
-      }
-
-      /**
-      * 预加载方法
-      */
-      preLoading = () => {
         // ...
       }
 
@@ -240,28 +209,272 @@ Controller层是负责用户交互的
 Model层:  
 - 页面的状态  
 - 添加一个监听/发布库，页面状态发生变化时通知上层  
+  ``` javascript  
+    import PubSub from 'pubsub-js';
+    export const TRANSITION_PAGE_STATE_EVENT = Symbol('TRANSITION_PAGE_STATE_EVENT');
+
+    export const TransitionPageState = { // 过渡页状态的map
+      start: '...',
+      reStart: '...',
+      willCancel: '...',
+      cancel: '...',
+      willEnd: '...',
+      end: '...',
+    }
+
+    class VRModel {
+      constructor() {
+        this._transitionPageStage = null;
+      }
+
+      // ...
+
+      set transitionPageStage(stage) {
+        this._transitionPageStage = stage;
+        PubSub.publish(TRANSITION_PAGE_STATE_EVENT, stage);
+      }
+    }
+  ```  
+  - 暴露给上层的是监听的事件名称: TRANSITION_PAGE_STATE_EVENT  
+  - 添加了状态，主要是根据业务需求定义  
+  **相教于之前Model层在状态变化时能发出一个dataChange事件**（正在考虑如果设置的状态和上次一样要不要触发事件）  
+
 
 View/ViewModel:  
-- 绘制页面 （添加删除DOM）-> 提供事件，具体的DOM及DOM上的事件移到Controller层，由Controller决定画什么  
-- 监听事件  页面的开始、结束、取消事件。 收集回调函数  
-- 一些事件会设置Model层的状态 -> 不设置Model层的数据 提供事件由Controller层来设置  
-- 提供给二次开发用的API  
+- 绘制页面  
+- 提供修改Model层数据的接口  
+  ``` javascript  
+    // 依旧提供datachange事件 代理model层和自己的数据
+    import PubSub from 'pubsub-js';
+    // ... 
+
+    class TransitionPage {
+      constructor(Ai, options, controller) {
+        // ...
+        this.pageState = '';
+
+        PubSub.subscribe(TRANSITION_PAGE_STATE_EVENT, this.transitionPageStageChange);
+      }
+
+      // 代理了MODEL层的数据的事件 变化了通知上层
+      transitionPageStageChange = (msg, stage) => {
+        // ...
+      }
+
+      // --------- 绘制DOM相关 ---------
+
+      createElement = () => {
+        return this.$el = this.controller.render();
+      }
+
+      // 把createElement出来的东西挂载到页面上
+      $mount = () => {
+        // ...
+        document.body.appendChild(this.createElement());
+        // ...
+        // 通知上层DOM绘制结束
+        this.controller.mounted && this.controller.mounted();
+      }
+
+      // 移除DOM
+      $removeDom = () => {
+        this.$el && document.body.removeChild(this.$el);
+        this.$el = null;
+        this.controller.destory && this.controller.destory();
+      }
+
+      /**
+      * 卸载
+      */
+      $destory = (stage) => {
+        // ...
+        this.setTransitionPageState(stage);
+        this.$removeDom();
+      }
+
+      // --------- 提供接口设置数据 ---------
+
+      /**
+      * 设置过渡页面状态
+      */
+      setTransitionPageState = (state) => {
+        vRModel.transitionPageStage = state;
+      }
+
+      /**
+      * 过渡页面 - 开始
+      */
+      start = () => {
+        // ...
+        this.$mount();
+        this.setTransitionPageState(TransitionPageState.start);
+        // ...
+      }
+
+      /**
+      * 过渡页面 - 重新开始
+      */
+      reStart = () => {
+        // ...
+        this.$mount();
+        this.setTransitionPageState(TransitionPageState.reStart);
+        // ...
+      }
+
+      /**
+      * 过渡页面 - 取消
+      */
+      cancel = () => {
+        this.setTransitionPageState(TransitionPageState.willCancel);
+        this.$destory(TransitionPageState.cancel);
+      }
+
+      /**
+      * 过渡页面 - 结束
+      */
+      end = () => {
+        this.setTransitionPageState(TransitionPageState.willEnd);
+        this.$destory(TransitionPageState.end);
+      }
+    }
+
+    export default TransitionPage;
+
+  ```  
 
 Controller:  
 - 监听感兴趣的事件  
 - 通过调用事件来设置Model的状态  
 - 收集第三方的回调函数，适当的时候触发  
+  ``` javascript  
+    import PubSub from 'pubsub-js';
+    // ...
+
+    class VRController {
+      constructor(Ai, options) {
+        // ...
+
+        PubSub.subscribe(AGENT_PAGE_STATE_EVENT, this.transitionPageStageChange);
+      }
+      
+      // 监听感兴趣的事件
+      // 收集第三方的回调函数，适当的时候触发
+      transitionPageStageChange = (msg, stage) => {
+        this.transitionPageState = stage;
+        // ...
+        if (stage === AgentTransitionPageState.willCancel) {
+          // ...
+          this.cancelCallBack && this.cancelCallBack();
+        }
+        // ...
+      }
+
+      /**
+      * 要绘制的DOM
+      */
+      render = () => {
+        try {
+          template = `<div>xxx</div>`;
+          this.$el.innerHTML = template;
+          return this.$el;
+        } catch (err) {
+          console.log(err);
+        }
+      }
+
+      /**
+      * DOM层绘制完的回调
+      */
+      mounted = () => {
+        document.getElementById('...').addEventListener('click', () => {});
+      }
+
+      /**
+      * 卸载之前的同步事件
+      * 这个函数会设置过渡页面是否在卸载中
+      */
+      beforeDestory = () => {
+        return this.fadeOutDom();
+      }
+
+      /**
+      * VM层绘卸载DOM后会调用一下这个事件通知DOM卸载完成了
+      */
+      destory = () => {
+        document.getElementById('...').removeEventListener('click', () => {});
+      }
+
+      // 淡出DOM
+      fadeOutDom = () => {
+        // ...
+      }
+
+      /**
+      * 点击取消按钮的事件
+      */
+      cancelTransitionPageEvent = () => {
+        // ...
+        this.TransitionPage.cancel();
+      }
+
+      // -------------------------------------------------------------------------------
+
+      // 初始化提供给展示端控制的API
+      initApi = () => {
+        this.Ai.xxx = {
+          createTransitionPage: this.createTransitionPage, // 绘制页面
+          finishTransitionPage: this.finishTransitionPage, // 卸载页面
+          cancelTransitionPage: this.cancelTransitionPage, // 取消页面
+        }
+      }
+
+      /**
+      * 创建过渡页面
+      */
+      createTransitionPage = (options) => {
+        // ...
+        this.TransitionPage.start();
+        // ...
+      }
+
+      /**
+      * 卸载过渡页面
+      */
+      finishTransitionPage = () => {
+        // ...
+        this.TransitionPage.end();
+      }
+
+      /**
+      * 取消过渡页面
+      */
+      cancelTransitionPage = () => {
+        this.TransitionPage.cancel();
+      }
+
+    }
+
+    export default VRController;
+
+  ```  
+
+整体相比之前的分层:  
+- 数据下沉（页面状态在Model层）, 这些数据体现的业务需求  
+- 具体的事件上浮，绘制什么DOM上浮到controller层，感兴趣的事件也上浮到controller由自己绑定  
+- 二次开发的API也在controller层  
+- view层类似一个傀儡，提供一些事件由上层控制  
+
+*Model的数据更新发出DataChanged事件后，由Controller负责监听并Update View，这样就变成了MVP架构*  
 
 ### 判断写的程序架构是否优良  
 - 最低耦合原则  
 - 单一职责原则  
 
-*Model的数据更新发出 DataChanged 事件后，由 Controller 负责监听并 Update View，这样就变成了MVP架构。*  
-
 # VUE  
 ## 向大佬递自己  
 MVVM 最早是由微软工程师 John Grossman 于 2005 年提出的。ViewModel 作为 View 的数据抽象层，持有 View 的状态和行为。
-ViewModel 和 View 不应该有引用关系，而是由中间者，将它们绑定。ViewModel 改变后自动的触发对应 View 的更新，View 的触发事件后，ViewModel 接收并做处理。在实现层面这种绑定关系最适合由响应式框架来做，从而实现 ViewModel 和 View 的双向绑定。
+ViewModel 和 View 不应该有引用关系，而是由中间者，将它们绑定。ViewModel 改变后自动的触发对应 View 的更新，View 的触发事件后，ViewModel 接收并做处理。在实现层面这种绑定关系最适合由响应式框架来做，从而实现 ViewModel 和 View 的双向绑定。  
+业务逻辑层，View需要什么数据，ViewModel要提供这个数据；View有某些操作，ViewModel就要响应这些操作，所以可以说它是Model for View.  
 
 # React + (Redux | Mobx)  
 - JSX
