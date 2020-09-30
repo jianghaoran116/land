@@ -207,7 +207,7 @@ Controller层是负责用户交互的
 
 **修改后的分层:**  
 Model层:  
-- 页面的状态  
+- 页面的状态 因为有个异步事件所以添加了即将取消 即将结束的状态  
 - 添加一个监听/发布库，页面状态发生变化时通知上层  
   ``` javascript  
     import PubSub from 'pubsub-js';
@@ -461,7 +461,6 @@ Controller:
 整体相比之前的分层:  
 - 数据下沉（页面状态在Model层）, 这些数据体现的业务需求  
 - 具体的事件上浮，绘制什么DOM上浮到controller层，感兴趣的事件也上浮到controller由自己绑定  
-- 二次开发的API也在controller层  
 - view层类似一个傀儡，提供一些事件由上层控制  
 
 *Model的数据更新发出DataChanged事件后，由Controller负责监听并Update View，这样就变成了MVP架构*  
