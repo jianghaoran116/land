@@ -1,7 +1,7 @@
 ---
 layout: post  
 title: "MVC"  
-date: 2020-09-14  
+date: 2020-09-21  
 categories: javascript  
 tags: js  
 ---
@@ -164,7 +164,7 @@ tags: js
   ```  
   这层拿到了view和model 设置自己需要的事件 设置model里的数据  
 
-接下来继续学习一下MVC  
+接下来继续学习一下MVC的概念  
 
 ## MVC  
 上来直接抛个问题: M越厚越好？  
@@ -465,6 +465,10 @@ Controller:
 
 *Model的数据更新发出DataChanged事件后，由Controller负责监听并Update View，这样就变成了MVP架构*  
 所以这里其实更像是MVP模式，如果把更新View放到VM里，就更像是MVVM，Controller层只改状态，VM自动去触发View更新  
+
+
+### 引入hooks拦截函数  
+用于在卸载之前还想处理一些异步或者同步的事件  
 
 # VUE  
 ## 向大佬（Watcher）递自己  
