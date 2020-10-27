@@ -54,7 +54,7 @@ $$
 
 **那么如何推导出P**
 
-![原型链]({{ site.url }}/land/pics/ppm-1.jpg)  
+![效果图]({{ site.url }}/land/pics/ppm-1.jpg)  
 
 - 任意一点投影到近平面  
   相机坐标系中的任意一点p[x<sub>e</sub>,y<sub>e</sub>,z<sub>e</sub>]投影到平面得到点p<pub>'</pub>[x<sub>p</sub>,y<sub>p</sub>,-nearlVal]
