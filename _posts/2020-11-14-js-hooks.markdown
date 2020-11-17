@@ -1,0 +1,52 @@
+---
+layout: post  
+title: "hooks"  
+date: 2020-11-14  
+categories: javascript  
+tags: js  
+---
+
+# 希望在执行函数前执行一些定义的钩子函数  
+``` javascript  
+  export const hook = () => {
+    const _hooks = {};
+    // ...
+  }
+```  
+
+## 事件注册  
+注册事件，数据结构采用数组，返回一个函数可以注销自己。
+``` javascript  
+  function register(key, fn) {
+    if (!this._hooks[key]) {
+      this._hooks[key] = [];
+    }
+
+    this._hooks[key].push(fn);
+
+    return unRegister() {
+      const fns = this._hooks[key];
+      const idx = fns.indexOf(fn);
+      fns.splice(idx, 1);
+    }
+  }
+```  
+
+## 同步执行某个事件的处理函数链，并返回处理结果  
+使用的时候是在注册的时候写好事件，然后在这触发
+this.hooks.syncExec('key', 1)
+``` javascript  
+  function syncExec(key, ...args) {
+    const fns = this._hooks[key];
+    let idx = 0;
+
+    const next = function(...args) {
+      const fn = fns[idx++].call(this, next.bind(this));
+      return fn.apply(this, args);
+    }
+
+    return next.apply(this, args);
+  }
+``` 
+
+## 异步执行某个事件的处理函数链，并返回处理结果  
