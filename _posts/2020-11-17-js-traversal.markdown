@@ -1,6 +1,6 @@
 ---
 layout: post  
-title: "traversal"  
+title: "JS中的遍历"  
 date: 2020-11-17  
 categories: javascript  
 tags: js  
@@ -46,7 +46,9 @@ console.log('ownKeys:::', ownKeys);
   遍历的属性只包含symbol  
 - Refect.ownKeys()  
   遍历的属性包含symbl  
+
 ## 数组  
+
 - 会改变原数组的方法  
   push、pop、shift、unshift  
   splice  
@@ -68,11 +70,15 @@ for (let value of arr.values()) {
   console.log('value:::', value);
 }
 ```  
+
 ## Map Set  
+
 - keys  
 - values  
 - entries  
+
 ## 迭代器  
+
 - [Symbol.iterator]
   是一个函数 返回一个无参数的next函数 里面包含一个对象 有done属性和value done表示是否结束 value表示当前遍历的值  
 ``` javascript  
@@ -123,5 +129,7 @@ for (let value of authors) {
 }
 
 ```  
+
 ## 异步迭代器  
-- [Symbol.asyncIterator]
+
+- [Symbol.asyncIterator]  
